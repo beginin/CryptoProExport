@@ -1,21 +1,15 @@
-﻿$savedir=$env:APPDATA + "\Keys\"
+$savedir=$env:APPDATA + "\Keys\"
 $remotedir = "C:\1\"
 $CryptoPath = "HKLM:\SOFTWARE\Wow6432Node\Crypto Pro\Settings\Users\"
-$sid = "S-1-5-21-660057686-3371911695-2948132495-1000"
-$Path = $CryptoPath + $sid + "\Keys\19742075@2018-04-13-Бегинин Владимир Александрович"
+$sid = [System.Security.Principal.WindowsIdentity]::GetCurrent().user.value
+$UserPath = $CryptoPath + $sid + "\Keys"
 
-foreach ($key in Get-Item -Path $CryptoPath  | Get-ChildItem -ErrorAction SilentlyContinue -Recurse) {
-    Write-Host "------"
+foreach ($key in Get-Item -Path $UserPath  | Get-ChildItem -ErrorAction SilentlyContinue -Recurse) {
+   
     try {
-        Get-ItemProperty -Path $key.PSPath -Name header.key 
-        $key | Get-Member
-        $key
-        $key.Name.Split("\\")[-1]
-        #Write-Host "Name key"
-        #Get-Item -Path $key 
+ 
         $folder = $savedir + $key.Name.Split("\\")[-1]
         $remotefolder = $remotedir + $key.Name.Split("\\")[-1]
-        $folder
         $header = Get-ItemProperty -Path $key.PSPath -Name header.key -ErrorAction Stop
         $masks = Get-ItemProperty -Path $key.PSPath -Name masks.key -ErrorAction Stop
         $masks2 = Get-ItemProperty -Path $key.PSPath -Name masks2.key -ErrorAction Stop
@@ -36,7 +30,6 @@ foreach ($key in Get-Item -Path $CryptoPath  | Get-ChildItem -ErrorAction Silent
         [io.file]::WriteAllBytes($remotefolder + '\name.key',$name.'name.key')
         [io.file]::WriteAllBytes($remotefolder + '\primary.key',$primary.'primary.key')
         [io.file]::WriteAllBytes($remotefolder + '\primary2.key',$primary2.'primary2.key')
-
 
     }
     catch {
